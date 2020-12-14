@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-180187723-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-180187723-1');
+</script>
+<!-- End Google Analytics -->
+
+  
+  <title>nt!PspSelectNodeForProcess でブルースクリーンが発生する | Microsoft Japan Windows Technology Support Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="概要Windows Server 2016, Windows Server 2019 で運用している大規模サーバーを再起動せずに連続稼働させるとnt!PspSelectNodeForProcess でブルースクリーンが発生することがあります。 問題の発生要因NUMA ノードが複数ある環境でプロセスをどのノードで動かすか選択するために nt!PspSelectNodeForProcess が実行され">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nt!PspSelectNodeForProcess でブルースクリーンが発生する">
+<meta property="og:url" content="https://jpwinsup.github.io/blog/2020/11/12/Performance/Hang_BSOD/pspselectnodeforprocess/index.html">
+<meta property="og:site_name" content="Microsoft Japan Windows Technology Support Blog">
+<meta property="og:description" content="概要Windows Server 2016, Windows Server 2019 で運用している大規模サーバーを再起動せずに連続稼働させるとnt!PspSelectNodeForProcess でブルースクリーンが発生することがあります。 問題の発生要因NUMA ノードが複数ある環境でプロセスをどのノードで動かすか選択するために nt!PspSelectNodeForProcess が実行され">
+<meta property="og:locale" content="ja_JP">
+<meta property="article:published_time" content="2020-11-12T04:00:00.000Z">
+<meta property="article:modified_time" content="2020-12-14T02:34:15.534Z">
+<meta property="article:author" content="Microsoft Japan Windows Technology Support Team">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/blog/atom.xml" title="Microsoft Japan Windows Technology Support Blog" type="application/atom+xml">
+  
+
+  <link rel="icon" href="/blog/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/favicon-16x16.png">
+  <link rel="manifest" href="/blog/site.webmanifest">
+  <link rel="mask-icon" href="/blog/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="theme-color" content="#ffffff">
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/blog/css/style.css">
+
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="site-header-logo"></div>
+  <div id="site-header-blog-wrapper"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        <div id="ms-logo"></div>
+        
+          <a class="main-nav-link" href="/blog/">Home</a>
+        
+          <a class="main-nav-link" href="/blog/archives">Archives</a>
+        
+        <a class="main-nav-link" target="_blank" rel="noopener" href="https://cssjpn.github.io/">サポート情報</a>
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/blog/atom.xml" title="RSSフィード"></a>
+        
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.bing.com/search" method="get" accept-charset="UTF-8" name="bing-search" onsubmit="var f=this;if(f['q'].value){var searchUrl =  'https://www.bing.com/search?q=' +  encodeURIComponent(f['q'].value + ' site:' + f['sitesearch'].value) ;window.open(searchUrl, 'blank') };return false;" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="検索"><button type="submit" id="nav-search-btn" class="search-form-submit"></button><input type="hidden" name="sitesearch" value="https://jpwinsup.github.io/blog"></form>
+      </div>
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/blog/" id="logo">Microsoft Japan Windows Technology Support Blog</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/blog/" id="subtitle">日本マイクロソフト Windows Support チームによる、サポート情報 Blog です。</a>
+        </h2>
+      
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-Performance/Hang_BSOD/pspselectnodeforprocess" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+    
+      <header class="article-header-single">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      nt!PspSelectNodeForProcess でブルースクリーンが発生する
+    </h1>
+  
+
+      </header>
+      <div class="article-share">
+        Last Update: 
+        <a href="/blog/2020/11/12/Performance/Hang_BSOD/pspselectnodeforprocess/" class="article-date-single">
+  <time datetime="2020-11-12T04:00:00.000Z" itemprop="datePublished">2020-11-12</time>
+</a>
+        
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/Performance/">Performance</a>►<a class="article-category-link" href="/blog/categories/Performance/Hang-BSOD/">Hang_BSOD</a>
+  </div>
+
+        
+        <a href="https://github.com/jpwinsup/blog/issues/new?title=&body=%EF%BB%BF%0A%0A---%0A%0A%23%23%23%23+Document+Details%0A%0A*+Article+ID%3A+60ae48e3-7b2c-52ed-9a06-796a4badf2a5%0A*+TITLE%3A+nt%21PspSelectNodeForProcess+%E3%81%A7%E3%83%96%E3%83%AB%E3%83%BC%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%81%8C%E7%99%BA%E7%94%9F%E3%81%99%E3%82%8B%0A*+URL+https%3A%2F%2Fjpwinsup.github.io%2Fblog%2F2020%2F11%2F12%2FPerformance%2FHang_BSOD%2Fpspselectnodeforprocess%2F%0A*+SourceFileName%3A+source%2F_posts%2FPerformance%2FHang_BSOD%2Fpspselectnodeforprocess.md%0A" class="article-github-issue-link" target="_blank" rel="noopener noreferrer">feedback</a>
+        
+        <a data-url="https://jpwinsup.github.io/blog/2020/11/12/Performance/Hang_BSOD/pspselectnodeforprocess/" data-id="ckiny1n08000a0nn81qag4ev3" class="article-share-link">共有</a>
+      </div>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h1><p>Windows Server 2016, Windows Server 2019 で運用している大規模サーバーを再起動せずに連続稼働させるとnt!PspSelectNodeForProcess でブルースクリーンが発生することがあります。</p>
+<h1 id="問題の発生要因"><a href="#問題の発生要因" class="headerlink" title="問題の発生要因"></a>問題の発生要因</h1><p>NUMA ノードが複数ある環境でプロセスをどのノードで動かすか選択するために nt!PspSelectNodeForProcess が実行されます。<br>nt!PspSelectNodeForProcess の内部で持っているカウンターがオーバーフローした場合にこの問題が発生します。<br>NUMA の構成ではない環境や定期的に再起動している環境では、このカウンターがオーバーフローしないため、問題は発生しません。<br>NUMA 構成となっているかどうか Sysinternals で公開されている <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/sysinternals/downloads/coreinfo">Coreinfo</a> コマンドなどで確認できます。</p>
+<h1 id="対処策"><a href="#対処策" class="headerlink" title="対処策"></a>対処策</h1><p>以下のロールアップにて、この問題は修正されました。<br>これ以降のロールアップを適用することで対処してください。</p>
+<p><a target="_blank" rel="noopener" href="https://support.microsoft.com/ja-jp/help/4580346">Windows Server 2016</a></p>
+<p><a target="_blank" rel="noopener" href="https://support.microsoft.com/ja-jp/help/4580390/windows-10-update-kb4580390">Windows Server 2019</a></p>
+<p><strong>※ 2 年以上連続運用していた環境で実際に問題が発生したことが報告されております。オーバーフローが発生する前に再起動することで本問題は回避可能ですが、nt!PspSelectNodeForProcess の内部で持っているカウンターがいくつになっているのか確認する方法がないため、確実に対処されたい場合にはロールアップを適用してください。</strong></p>
+
+      
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/blog/2020/11/20/ActiveDirectory/WindowsHello/Unable-to-logon-using-WH4B-cache-after-changing-user-password/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">次の記事</strong>
+      <div class="article-nav-title">
+        
+          ユーザーのパスワード変更後に Windows Hello for Business でキャッシュ ログオンできなくなる事象について
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2020/11/09/UserInterfaceAndApps/how-to-create-themefile-on-Windows10/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前の記事</strong>
+      <div class="article-nav-title">Windows 10 用のテーマ ファイル作成方法</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">カテゴリ</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Active-Directory/">Active Directory</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Active-Directory/Windows-Hello/">Windows Hello</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Hyper-V/">Hyper-V</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Hyper-V/Configuration-and-Management/">Configuration and Management</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Performance/">Performance</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Performance/Hang-BSOD/">Hang_BSOD</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Public-Key-Infrastructure/">Public Key Infrastructure</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Public-Key-Infrastructure/Certificate-Management/">Certificate Management</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Remote-Desktop/">Remote Desktop</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Remote-Desktop/Remote-Desktop-Service-RDS/">Remote Desktop Service (RDS)</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/Remote-Desktop/Windows-Virtual-Desktop-WVD/">Windows Virtual Desktop (WVD)</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/User-Interface-and-Apps/">User Interface and Apps</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/User-Interface-and-Apps/Microsoft-Store/">Microsoft Store</a></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/User-Interface-and-Apps/Server-Management/">Server Management</a></li></ul></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最近の投稿</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2020/12/14/Hyper-V/ConfigurationAndManagement/VMMS-CSV-Aleart/">Hyper-V Cluster 環境における CSV 空き容量について</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2020/12/10/RemoteDesktopService/WVD/remove-a-user-assignment-for-personal-desktop-host-pool/">個人用ホストプールに割り当ていたユーザーの解除について</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2020/12/04/UserInterfaceAndApps/MaxSizeofEventLogsAdded/">セキュリティ ログの最大サイズをポリシーで配布する際にローカルの値に加算される場合があります</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2020/12/02/UserInterfaceAndApps/how-to-set-gpo-about-DefaultApps/">既定のアプリをグループ ポリシーで固定する方法</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2020/11/20/ActiveDirectory/WindowsHello/Unable-to-logon-using-WH4B-cache-after-changing-user-password/">ユーザーのパスワード変更後に Windows Hello for Business でキャッシュ ログオンできなくなる事象について</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">アーカイブ</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2020/12/">2020 / 12</a></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2020/11/">2020 / 11</a></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2020/10/">2020 / 10</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 Microsoft Japan Windows Technology Support Team<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/blog/" class="mobile-nav-link">Home</a>
+  
+    <a href="/blog/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+<script src="/blog/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
